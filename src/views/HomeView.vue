@@ -14,6 +14,7 @@ import {
   endBefore,
   orderBy,
   where,
+  or,
   getAggregateFromServer,
   average,
   count,
@@ -30,6 +31,7 @@ const sortBy = ["ยอดนิยม", "ความยาก: ง่าย-�
 const selectedCategories = ref([]);
 const selectedDifficulty = ref("");
 const selectedSortBy = ref("ยอดนิยม");
+const isBeginnerMode = ref(false);
 
 const firstVisible = ref(null);
 const lastVisible = ref(null);
@@ -45,6 +47,7 @@ const clearFilter = () => {
   selectedCategories.value = [];
   selectedDifficulty.value = "";
   selectedSortBy.value = "ยอดนิยม";
+  isBeginnerMode.value = false;
   searchStore.setSearch("");
 };
 
@@ -67,6 +70,29 @@ const buildStaticQuery = () => {
   } else if (selectedSortBy.value === "ความยาก: มาก-ง่าย") {
     orderByField = "difficulty";
     orderByDirection = "desc";
+  }
+
+  // โหมดเหมาะกับมือใหม่: พืชที่ปลูกง่าย หรือ ง่ายมาก
+  if (isBeginnerMode.value) {
+    const beginnerQuery = or(
+      where("difficulty", "==", "ง่าย"),
+      where("difficulty", "==", "ง่ายมาก")
+    );
+
+    if (hasCategory) {
+      return query(
+        plantRef,
+        beginnerQuery,
+        where("category.name", "in", selectedCategories.value),
+        orderBy(orderByField, orderByDirection)
+      );
+    }
+
+    return query(
+      plantRef,
+      beginnerQuery,
+      orderBy(orderByField, orderByDirection)
+    );
   }
 
   if (hasCategory && hasDifficulty) {
@@ -103,6 +129,7 @@ const handleSnapshot = (snap) => {
 
   firstVisible.value = snap.docs[0] || null;
   lastVisible.value = snap.docs[snap.docs.length - 1] || null;
+  hasNextPage.value = snap.docs.length === 10;
 };
 
 const getFirstPage = async () => {
@@ -187,12 +214,14 @@ watch(
     selectedCategories,
     selectedDifficulty,
     selectedSortBy,
+    isBeginnerMode,
     () => searchStore.search,
   ],
   () => {
     isHasFilter.value =
       selectedCategories.value.length > 0 ||
       selectedDifficulty.value ||
+      isBeginnerMode.value ||
       searchStore.search;
 
     getFirstPage();
@@ -220,6 +249,17 @@ watch(
         </h1>
 
         <div class="flex flex-col gap-4 mt-4">
+          <div class="form-control">
+            <label class="label cursor-pointer justify-start gap-3">
+              <input
+                type="checkbox"
+                v-model="isBeginnerMode"
+                class="checkbox checkbox-success"
+              />
+              <span class="label-text font-medium"> 🌱 เหมาะกับมือใหม่ </span>
+            </label>
+          </div>
+
           <FilterList
             title="หมวดหมู่"
             :menu="categories"
@@ -231,6 +271,7 @@ watch(
             :menu="difficulty"
             type="radio"
             v-model="selectedDifficulty"
+            :disabled="isBeginnerMode"
           />
         </div>
 
@@ -250,7 +291,9 @@ watch(
     </template>
     <template #main>
       <div class="mt-6">
-        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+        <div
+          class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3"
+        >
           <div class="flex items-center gap-2">
             <h1 class="text-lg md:text-xl">รายการทั้งหมด</h1>
             <p class="text-black/60 text-xs">

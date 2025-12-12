@@ -9,7 +9,7 @@ const toggleMobileMenu = () => {
 </script>
 
 <template>
-  <div class="xl:max-w-7xl 2xl:max-w-[1440px] mx-auto min-h-screen pb-12 md:pb-24 lg:pb-48 px-4 md:px-6">
+  <div class="xl:max-w-7xl 2xl:max-w-[1440px] bg-transparent mx-auto min-h-screen pb-12 md:pb-24 lg:pb-48 px-4 md:px-6">
     <button
       @click="toggleMobileMenu"
       class="lg:hidden fixed bottom-4 right-4 z-50 bg-pink-400 text-white p-4 rounded-full shadow-lg hover:bg-pink-500"
@@ -37,7 +37,7 @@ const toggleMobileMenu = () => {
 
     <div class="flex flex-col lg:flex-row">
       <div
-        class="lg:flex-1 fixed pl-10 lg:p-0 lg:static inset-y-0 left-0 z-40 lg:-z-1 bg-white transform transition-transform duration-300 w-64 overflow-y-auto"
+        class="lg:flex-1 fixed pl-10 lg:p-0 lg:static inset-y-0 left-0 z-40 transform transition-transform duration-300 w-64 overflow-y-auto bg-white lg:bg-transparent"
         :class="isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'"
       >
         <slot name="sidebar"></slot>

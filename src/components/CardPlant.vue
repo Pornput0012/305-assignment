@@ -1,4 +1,10 @@
 <script setup>
+import { useRouter } from "vue-router";
+import db from "@/firebase/init";
+import { doc, updateDoc, increment } from "firebase/firestore";
+
+const router = useRouter();
+
 const props = defineProps({
   id: {
     type: String,
@@ -38,13 +44,23 @@ const badgeColorDifficulty = () => {
       return "bg-red-200 text-red-700";
   }
 };
+
+const handleClick = async () => {
+  try {
+    const plantRef = doc(db, "plants", props.id);
+    await updateDoc(plantRef, {
+      viewCount: increment(1),
+    });
+    router.push({ name: "plant-detail", params: { plantId: props.id } });
+  } catch (error) {
+    console.error("Error updating view count:", error);
+    router.push({ name: "plant-detail", params: { plantId: props.id } });
+  }
+};
 </script>
 
 <template>
-  <router-link
-    :to="{ name: 'plant-detail', params: { plantId: id } }"
-    class="w-full h-80 group"
-  >
+  <div @click="handleClick" class="w-full h-80 group cursor-pointer">
     <div
       class="rounded-xl shadow hover:shadow-xl hover:-translate-y-1 h-full transition-all duration-200 overflow-hidden"
     >
@@ -140,7 +156,7 @@ const badgeColorDifficulty = () => {
         </div>
       </div>
     </div>
-  </router-link>
+  </div>
 </template>
 
 <style scoped>

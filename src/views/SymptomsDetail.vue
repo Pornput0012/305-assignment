@@ -1,13 +1,6 @@
 <script setup>
 import db from "@/firebase/init";
-import {
-  doc,
-  getDoc,
-  collection,
-  query,
-  where,
-  getDocs,
-} from "firebase/firestore";
+import { doc, getDoc } from "firebase/firestore";
 import { onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
 import Callout from "@/components/Callout.vue";
@@ -28,17 +21,17 @@ const getSpecificPlants = async () => {
     return;
   }
 
-  const plantRef = collection(db, "plants");
-  const q = query(
-    plantRef,
-    where("__name__", "in", sym.value.specificPlantIds)
-  );
-  const plantSnap = await getDocs(q);
+  const plantPromises = sym.value.specificPlantIds.map(async (plantId) => {
+    const plantDocRef = doc(db, "plants", plantId);
+    const plantSnap = await getDoc(plantDocRef);
+    if (plantSnap.exists()) {
+      return { id: plantSnap.id, ...plantSnap.data() };
+    }
+    return null;
+  });
 
-  plants.value = plantSnap.docs.map((doc) => ({
-    id: doc.id,
-    ...doc.data(),
-  }));
+  const plantsData = await Promise.all(plantPromises);
+  plants.value = plantsData.filter((plant) => plant !== null);
 };
 
 onMounted(async () => {
@@ -74,7 +67,9 @@ onMounted(async () => {
                 >
               </div>
               <div class="flex flex-col items-center mb-6 gap-2">
-                <h1 class="text-2xl md:text-3xl font-bold text-center">{{ sym.name }}</h1>
+                <h1 class="text-2xl md:text-3xl font-bold text-center">
+                  {{ sym.name }}
+                </h1>
                 <p class="italic text-gray-300 text-sm md:text-base">
                   {{ sym.isGenrenal ? "โรคทั่วไป" : "โรคเฉพาะพืช" }}
                 </p>
@@ -84,7 +79,9 @@ onMounted(async () => {
         </div>
       </div>
 
-      <div class="breadcrumbs text-sm font-light absolute right-4 md:right-6 bottom-3">
+      <div
+        class="breadcrumbs text-sm font-light absolute right-4 md:right-6 bottom-3"
+      >
         <ul>
           <li>
             <router-link to="/" class="text-white/60 hover:text-white"
@@ -116,7 +113,9 @@ onMounted(async () => {
               />
             </svg>
           </template>
-          <p class="text-gray-600 text-sm md:text-base">{{ sym.description }}</p>
+          <p class="text-gray-600 text-sm md:text-base">
+            {{ sym.description }}
+          </p>
         </Callout>
         <Callout title="สาเหตุ">
           <template #icon>
@@ -160,11 +159,46 @@ onMounted(async () => {
         </Callout>
       </div>
 
-      <div v-if="sym.isGeneral" class="flex-1 lg:flex-3 relative flex flex-col lg:px-6">
-        <div class="hidden lg:block w-px h-1/2 left-0 absolute bg-black/30"></div>
+      <div
+        v-if="sym.isGeneral"
+        class="flex-1 lg:flex-3 relative flex flex-col lg:px-6"
+      >
+        <div
+          class="hidden lg:block w-px h-1/2 left-0 absolute bg-black/30"
+        ></div>
         <div class="border-t lg:border-t-0 pt-6 lg:pt-0">
           <Callout variant="info" title="โรคทั่วไป" class="max-w-full">
             <template #icon>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  fill="#1896f2"
+                  d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10s10-4.48 10-10S17.52 2 12 2m-2 15l-5-5l1.41-1.41L10 14.17l7.59-7.59L19 8z"
+                />
+              </svg>
+            </template>
+            <p class="text-gray-600 text-sm md:text-base">
+              โรคนี้สามารถเกิดขึ้นได้กับพืชหลายชนิด ไม่เฉพาะพืชใดชนิดหนึ่ง
+            </p>
+          </Callout>
+        </div>
+      </div>
+
+      <div
+        v-if="!sym.isGeneral"
+        class="flex-1 lg:flex-2 relative flex flex-col lg:px-6"
+      >
+        <div
+          class="hidden lg:block w-px h-1/2 left-0 absolute bg-black/30"
+        ></div>
+        <div class="border-t lg:border-t-0 pt-6 lg:pt-0">
+          <h1
+            class="flex items-center gap-2 text-pink-600 font-medium text-base md:text-lg"
+          >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="24"
@@ -172,64 +206,43 @@ onMounted(async () => {
               viewBox="0 0 24 24"
             >
               <path
-                fill="#1896f2"
-                d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10s10-4.48 10-10S17.52 2 12 2m-2 15l-5-5l1.41-1.41L10 14.17l7.59-7.59L19 8z"
+                fill="none"
+                stroke="#1fa978"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M7 15h10v4a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2zm5-6a6 6 0 0 0-6-6H3v2a6 6 0 0 0 6 6h3m0 0a6 6 0 0 1 6-6h3v1a6 6 0 0 1-6 6h-3m0 3V9"
               />
             </svg>
-          </template>
-          <p class="text-gray-600 text-sm md:text-base">
-            โรคนี้สามารถเกิดขึ้นได้กับพืชหลายชนิด ไม่เฉพาะพืชใดชนิดหนึ่ง
-          </p>
-        </Callout>
-        </div>
-      </div>
-
-      <div v-if="!sym.isGeneral" class="flex-1 lg:flex-2 relative flex flex-col lg:px-6">
-        <div class="hidden lg:block w-px h-1/2 left-0 absolute bg-black/30"></div>
-        <div class="border-t lg:border-t-0 pt-6 lg:pt-0">
-          <h1 class="flex items-center gap-2 text-pink-600 font-medium text-base md:text-lg">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-            >
-            <path
-              fill="none"
-              stroke="#1fa978"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M7 15h10v4a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2zm5-6a6 6 0 0 0-6-6H3v2a6 6 0 0 0 6 6h3m0 0a6 6 0 0 1 6-6h3v1a6 6 0 0 1-6 6h-3m0 3V9"
-            />
-          </svg>
-          <p>พืชที่เสี่ยงต่อโรคนี้</p>
-        </h1>
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-2 mt-4">
-          <router-link
-            v-for="plant in plants"
-            :key="plant.id"
-            :to="{ name: 'plant-detail', params: { plantId: plant.id } }"
-            class="p-2 w-full border rounded-md flex gap-2 hover:shadow-md transition-shadow"
+            <p>พืชที่เสี่ยงต่อโรคนี้</p>
+          </h1>
+          <div
+            class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-2 mt-4"
           >
-            <img
-              class="w-10 aspect-square object-cover rounded-md"
-              :src="plant.imageUrl"
-              alt=""
-            />
-            <div class="flex flex-col gap-2">
-              <h1 class="text-sm font-semibold">{{ plant.name }}</h1>
-              <span
-                class="badge badge-xs"
-                :class="
-                  plant.difficulty == 'ปานกลาง'
-                    ? 'badge-warning'
-                    : plant.difficulty == 'ยาก'
-                    ? 'badge-error'
-                    : 'badge-success'
-                "
-                >{{ plant.difficulty }}</span
-              >
+            <router-link
+              v-for="plant in plants"
+              :key="plant.id"
+              :to="{ name: 'plant-detail', params: { plantId: plant.id } }"
+              class="p-2 w-full border rounded-md flex gap-2 hover:shadow-md transition-shadow"
+            >
+              <img
+                class="w-10 aspect-square object-cover rounded-md"
+                :src="plant.imageUrl"
+                alt=""
+              />
+              <div class="flex flex-col gap-2">
+                <h1 class="text-sm font-semibold">{{ plant.name }}</h1>
+                <span
+                  class="badge badge-xs"
+                  :class="
+                    plant.difficulty == 'ปานกลาง'
+                      ? 'badge-warning'
+                      : plant.difficulty == 'ยาก'
+                      ? 'badge-error'
+                      : 'badge-success'
+                  "
+                  >{{ plant.difficulty }}</span
+                >
               </div>
             </router-link>
           </div>
@@ -237,4 +250,5 @@ onMounted(async () => {
       </div>
     </div>
   </div>
-</template><style scoped></style>
+</template>
+<style scoped></style>

@@ -32,7 +32,6 @@ const closeMobileMenu = () => {
       <Leaf size="32" class="hidden sm:block" />
     </div>
     
-    <!-- Desktop Navigation -->
     <div class="navbar-center hidden lg:flex">
       <div
         class="relative flex gap-2 shadow p-1.5 px-2.5 rounded-xl text-center"
@@ -63,7 +62,22 @@ const closeMobileMenu = () => {
     </div>
 
     <div class="navbar-end gap-2">
-      <!-- Search Bar - Hidden on small screens -->
+      <!-- Add Plant Button -->
+      <router-link
+        :to="{ name: 'create-plant' }"
+        class="btn btn-sm bg-green-600 hover:bg-green-700 text-white hidden md:flex"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+        >
+          <path fill="currentColor" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6z" />
+        </svg>
+        เพิ่มพืช
+      </router-link>
+
       <label class="input rounded-xl max-w-2/5 hidden md:flex">
         <input
           type="search"
@@ -94,7 +108,6 @@ const closeMobileMenu = () => {
         </svg>
       </label>
 
-      <!-- Mobile Menu Button -->
       <button
         @click="toggleMobileMenu"
         class="lg:hidden btn btn-ghost btn-circle"
@@ -131,7 +144,6 @@ const closeMobileMenu = () => {
     </div>
   </div>
 
-  <!-- Mobile Menu -->
   <div
     v-if="isMobileMenuOpen"
     class="lg:hidden fixed inset-0 z-50 bg-black/50"
@@ -155,7 +167,6 @@ const closeMobileMenu = () => {
       </div>
 
       <div class="flex flex-col gap-4">
-        <!-- Search in mobile menu -->
         <label class="input rounded-xl">
           <input
             type="search"
@@ -186,7 +197,6 @@ const closeMobileMenu = () => {
           </svg>
         </label>
 
-        <!-- Navigation Links -->
         <router-link
           :to="{ name: 'home' }"
           @click="closeMobileMenu"
