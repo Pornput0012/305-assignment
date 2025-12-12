@@ -1,0 +1,34 @@
+@import url("https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Prompt:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
+@import "tailwindcss";
+@plugin "daisyui";
+
+@theme {
+  --font-great-vibes: "Great Vibes", cursive;
+  --color-green-950: #0a4d32;
+  --color-green-900: #0f6844;
+  --color-green-800: #158a5e;
+  --color-green-700: #1a9668;
+  --color-green-600: #1fa978;
+  --color-green-500: #33b587;
+  --color-green-400: #4dbf96;
+  --color-green-300: #7dd4b3;
+  --color-green-200: #abe5cf;
+  --color-green-100: #c2eadc;
+  --color-green-50: #e8f7f2;
+  --color-pink-950: #4d0a23;
+  --color-pink-900: #6f0f34;
+  --color-pink-800: #8a1542;
+  --color-pink-700: #961a48;
+  --color-pink-600: #a91f50;
+  --color-pink-500: #b53366;
+  --color-pink-400: #c4577d;
+  --color-pink-300: #d4819e;
+  --color-pink-200: #e3abbe;
+  --color-pink-100: #edc4d3;
+  --color-pink-50: #f7e8ed;
+}
+
+* {
+  font-family: "Prompt", sans-serif;
+}
