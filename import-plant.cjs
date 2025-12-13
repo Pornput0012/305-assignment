@@ -23,6 +23,7 @@ var plants = [
     maxHeight: 5,
     viewCount: 1250,
     category: { id: "cat_001", name: "ไม้ผล", icon: "🍊" },
+    topSymptomIds: ["sym_007", "sym_009"],
     topSymptoms: [
       {
         id: "sym_007",
@@ -59,6 +60,7 @@ var plants = [
     maxHeight: 15,
     viewCount: 2100,
     category: { id: "cat_001", name: "ไม้ผล", icon: "🍊" },
+    topSymptomIds: ["sym_009", "sym_002"],
     topSymptoms: [
       {
         id: "sym_009",
@@ -95,6 +97,7 @@ var plants = [
     maxHeight: 6,
     viewCount: 1800,
     category: { id: "cat_001", name: "ไม้ผล", icon: "🍊" },
+    topSymptomIds: ["sym_008", "sym_004"],
     topSymptoms: [
       {
         id: "sym_008",
@@ -132,6 +135,7 @@ var plants = [
     maxHeight: 2,
     viewCount: 3500,
     category: { id: "cat_002", name: "ไม้ดอก", icon: "🌸" },
+    topSymptomIds: ["sym_011", "sym_002"],
     topSymptoms: [
       {
         id: "sym_011",
@@ -169,6 +173,7 @@ var plants = [
     maxHeight: 3,
     viewCount: 2800,
     category: { id: "cat_002", name: "ไม้ดอก", icon: "🌸" },
+    topSymptomIds: ["sym_003", "sym_006"],
     topSymptoms: [
       {
         id: "sym_003",
@@ -206,6 +211,7 @@ var plants = [
     maxHeight: 1,
     viewCount: 4200,
     category: { id: "cat_003", name: "พืชผัก", icon: "🥬" },
+    topSymptomIds: ["sym_010", "sym_009"],
     topSymptoms: [
       {
         id: "sym_010",
@@ -242,6 +248,7 @@ var plants = [
     maxHeight: 2,
     viewCount: 3100,
     category: { id: "cat_003", name: "พืชผัก", icon: "🥬" },
+    topSymptomIds: ["sym_010", "sym_005"],
     topSymptoms: [
       {
         id: "sym_010",
@@ -279,6 +286,7 @@ var plants = [
     maxHeight: 0.5,
     viewCount: 5600,
     category: { id: "cat_004", name: "สมุนไพร", icon: "🌿" },
+    topSymptomIds: ["sym_001", "sym_004"],
     topSymptoms: [
       {
         id: "sym_001",
@@ -316,6 +324,7 @@ var plants = [
     maxHeight: 1.5,
     viewCount: 2400,
     category: { id: "cat_004", name: "สมุนไพร", icon: "🌿" },
+    topSymptomIds: ["sym_001", "sym_003"],
     topSymptoms: [
       {
         id: "sym_001",
@@ -353,6 +362,7 @@ var plants = [
     maxHeight: 1,
     viewCount: 1900,
     category: { id: "cat_004", name: "สมุนไพร", icon: "🌿" },
+    topSymptomIds: ["sym_012", "sym_003"],
     topSymptoms: [
       {
         id: "sym_012",
@@ -390,6 +400,7 @@ var plants = [
     maxHeight: 0.5,
     viewCount: 3800,
     category: { id: "cat_003", name: "พืชผัก", icon: "🥬" },
+    topSymptomIds: ["sym_001", "sym_006"],
     topSymptoms: [
       {
         id: "sym_001",
@@ -427,6 +438,7 @@ var plants = [
     maxHeight: 1,
     viewCount: 4500,
     category: { id: "cat_002", name: "ไม้ดอก", icon: "🌸" },
+    topSymptomIds: ["sym_011", "sym_004"],
     topSymptoms: [
       {
         id: "sym_011",
@@ -467,6 +479,7 @@ plants.forEach(function (obj) {
       maxHeight: obj.maxHeight,
       viewCount: obj.viewCount,
       category: obj.category,
+      topSymptomIds: obj.topSymptomIds,
       topSymptoms: obj.topSymptoms,
       careInfo: obj.careInfo,
       isActive: true,

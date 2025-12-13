@@ -25,11 +25,21 @@ import { useSearchStore } from "@/stores/search";
 const searchStore = useSearchStore();
 const categories = ref([]);
 const plants = ref([]);
+const symptoms = ref([]);
 const difficulty = ["ง่าย", "ปานกลาง", "ยาก"];
+const heightRanges = [
+  { label: "0-1 เมตร", min: 0, max: 1 },
+  { label: "1-3 เมตร", min: 1, max: 3 },
+  { label: "3-5 เมตร", min: 3, max: 5 },
+  { label: "5-10 เมตร", min: 5, max: 10 },
+  { label: "10+ เมตร", min: 10, max: 999 },
+];
 const sortBy = ["ยอดนิยม", "ความยาก: ง่าย-มาก", "ความยาก: มาก-ง่าย"];
 
 const selectedCategories = ref([]);
 const selectedDifficulty = ref("");
+const selectedSymptom = ref("");
+const selectedHeightRange = ref(null);
 const selectedSortBy = ref("ยอดนิยม");
 const isBeginnerMode = ref(false);
 
@@ -46,6 +56,8 @@ const isHasFilter = ref(false);
 const clearFilter = () => {
   selectedCategories.value = [];
   selectedDifficulty.value = "";
+  selectedHeightRange.value = null;
+  selectedSymptom.value = "";
   selectedSortBy.value = "ยอดนิยม";
   isBeginnerMode.value = false;
   searchStore.setSearch("");
@@ -59,6 +71,8 @@ const buildStaticQuery = () => {
 
   const hasCategory = selectedCategories.value.length > 0;
   const hasDifficulty = selectedDifficulty.value !== "";
+  const hasHeightRange = selectedHeightRange.value !== null;
+  const hasSymptom = selectedSymptom.value !== "";
 
   let orderByField, orderByDirection;
   if (selectedSortBy.value === "ยอดนิยม") {
@@ -72,7 +86,33 @@ const buildStaticQuery = () => {
     orderByDirection = "desc";
   }
 
-  // โหมดเหมาะกับมือใหม่: พืชที่ปลูกง่าย หรือ ง่ายมาก
+  if (hasHeightRange) {
+    const range = heightRanges[selectedHeightRange.value];
+    const constraints = [
+      where("maxHeight", ">=", range.min),
+      where("maxHeight", "<=", range.max),
+    ];
+
+    if (hasCategory) {
+      constraints.push(where("category.name", "in", selectedCategories.value));
+    }
+
+    constraints.push(orderBy("maxHeight", "asc"));
+    return query(plantRef, ...constraints);
+  }
+
+  // Array-Contains: ค้นหาพืชที่มีโรคนี้
+  if (hasSymptom) {
+    const constraints = [where("topSymptomIds", "array-contains", selectedSymptom.value)];
+
+    if (hasCategory) {
+      constraints.push(where("category.name", "in", selectedCategories.value));
+    }
+
+    constraints.push(orderBy(orderByField, orderByDirection));
+    return query(plantRef, ...constraints);
+  }
+
   if (isBeginnerMode.value) {
     const beginnerQuery = or(
       where("difficulty", "==", "ง่าย"),
@@ -180,6 +220,12 @@ const getCategories = async () => {
   categories.value = snap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
 };
 
+const getSymptoms = async () => {
+  const snap = await getDocs(collection(db, "symptoms"));
+  symptoms.value = snap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+};
+
+
 const getAverageHeight = async () => {
   const plantsRef = collection(db, "plants");
   const snapshot = await getAggregateFromServer(plantsRef, {
@@ -204,6 +250,7 @@ const getMostPopularPlant = async () => {
 
 onMounted(() => {
   getCategories();
+  getSymptoms();
   getFirstPage();
   getAverageHeight();
   getMostPopularPlant();
@@ -213,6 +260,8 @@ watch(
   [
     selectedCategories,
     selectedDifficulty,
+    selectedHeightRange,
+    selectedSymptom,
     selectedSortBy,
     isBeginnerMode,
     () => searchStore.search,
@@ -221,6 +270,8 @@ watch(
     isHasFilter.value =
       selectedCategories.value.length > 0 ||
       selectedDifficulty.value ||
+      selectedHeightRange.value !== null ||
+      selectedSymptom.value ||
       isBeginnerMode.value ||
       searchStore.search;
 
@@ -273,6 +324,36 @@ watch(
             v-model="selectedDifficulty"
             :disabled="isBeginnerMode"
           />
+
+          <div class="border-t pt-4 max-w-[75%]">
+            <label class="block text-sm font-medium mb-2">🌾 ช่วงความสูง</label>
+            <select
+              v-model="selectedHeightRange"
+              class="select select-bordered select-sm w-full"
+            >
+              <option :value="null">ทั้งหมด</option>
+              <option
+                v-for="(range, index) in heightRanges"
+                :key="index"
+                :value="index"
+              >
+                {{ range.label }}
+              </option>
+            </select>
+          </div>
+
+          <div class="border-t pt-4 max-w-[75%]">
+            <label class="block text-sm font-medium mb-2">🦠 ค้นหาตามโรค</label>
+            <select
+              v-model="selectedSymptom"
+              class="select select-bordered select-sm w-full"
+            >
+              <option value="">ทั้งหมด</option>
+              <option v-for="sym in symptoms" :key="sym.id" :value="sym.id">
+                {{ sym.name }}
+              </option>
+            </select>
+          </div>
         </div>
 
         <button
