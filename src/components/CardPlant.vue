@@ -79,7 +79,7 @@ const handleClick = async () => {
             >{{ category }}</span
           >
           <span
-            class="flex items-center gap-1 text-xs text-white font-mono! p-2"
+            class="flex items-center gap-1 text-xs text-white z-10 font-mono! p-2"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"

@@ -101,7 +101,6 @@ const buildStaticQuery = () => {
     return query(plantRef, ...constraints);
   }
 
-  // Array-Contains: ค้นหาพืชที่มีโรคนี้
   if (hasSymptom) {
     const constraints = [where("topSymptomIds", "array-contains", selectedSymptom.value)];
 
